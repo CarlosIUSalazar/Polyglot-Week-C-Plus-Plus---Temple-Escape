@@ -33,8 +33,8 @@ void UGrabber::SetupInputComponent(){
 
 }
 
-void UGrabber::FindPhysicsHandle(){
 	//Checking for Physics Handle
+void UGrabber::FindPhysicsHandle(){
 	PhysicsHandle = GetOwner() -> FindComponentByClass<UPhysicsHandleComponent>();
 	if(PhysicsHandle)
 	{
@@ -51,6 +51,8 @@ void UGrabber::FindPhysicsHandle(){
 void UGrabber::Grab()
 {
 	UE_LOG(LogTemp,Warning,TEXT("Grabber Press"));
+	//Try and reach any actors with physics body collitions channel set
+	GetFirstPhysicsBodyInReach();
 }
 
 void UGrabber::Release()
@@ -62,7 +64,13 @@ void UGrabber::Release()
 void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+	//If the physics handle is attach
+		//Move object we are holding
+}
 
+FHitResult UGrabber::GetFirstPhysicsBodyInReach() const
+{
+	//Get players viewpoint
 	FVector PlayerViewPointLocation;
 	FRotator PlayerViewPointRotation;
 
@@ -71,25 +79,19 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 		OUT PlayerViewPointRotation
 	); //OUT parameters, Out is a keyowrd we deffined outselves near the header, it doesnt do anyuthing is only for readibility
 
-	// UE_LOG(LogTemp, Warning, TEXT("Location: %s Rotation: %s"), 
-	// *PlayerViewPointLocation.ToString(),
-	// *PlayerViewPointRotation.ToString()
-	// ); //%s is string
+	//THIS IS A DEBUG FUNCTIUON THAT Draws a laser like line from player showing the reach
+	// DrawDebugLine(
+	// 	GetWorld(),
+	// 	PlayerViewPointLocation,
+	// 	LineTraceEnd,
+	// 	FColor(0,255,0),
+	// 	false,
+	// 	0.f,
+	// 	0,
+	// 	5.f
+	// );
 
-	//Draw a line from player showing the reach
 	FVector LineTraceEnd = PlayerViewPointLocation + PlayerViewPointRotation.Vector() * Reach;
-
-	DrawDebugLine(
-		GetWorld(),
-		PlayerViewPointLocation,
-		LineTraceEnd,
-		FColor(0,255,0),
-		false,
-		0.f,
-		0,
-		5.f
-	);
-
 	FHitResult Hit;
 	//ray cast out to a certain distance
 	FCollisionQueryParams TraceParams(FName(TEXT("")), false, GetOwner());
@@ -108,6 +110,10 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 		UE_LOG(LogTemp, Error, TEXT("Line trace has hit: %s"), *(ActorHit -> GetName()))
 	}
 
+	if(ActorHit){
+		UE_LOG(LogTemp,Warning,TEXT("Line trace has hit: %s"),*(ActorHit->GetName()))
+	}
+
+	return Hit;
 
 }
-

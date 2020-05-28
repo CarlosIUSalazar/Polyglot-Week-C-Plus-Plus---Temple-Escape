@@ -35,4 +35,7 @@ private:
 	void FindPhysicsHandle();
 	void SetupInputComponent();
 
+	// Return the first Actor within reach with physics body.
+	FHitResult GetFirstPhysicsBodyInReach() const;
+
 };
