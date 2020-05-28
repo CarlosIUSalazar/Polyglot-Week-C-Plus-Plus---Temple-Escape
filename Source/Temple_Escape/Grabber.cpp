@@ -36,7 +36,7 @@ void UGrabber::SetupInputComponent(){
 	//Checking for Physics Handle
 void UGrabber::FindPhysicsHandle(){
 	PhysicsHandle = GetOwner() -> FindComponentByClass<UPhysicsHandleComponent>();
-	if(PhysicsHandle == nullptr)
+	if(!PhysicsHandle)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("No physics handle component found on %s!"), *GetOwner()->GetName());
 	}
@@ -49,13 +49,16 @@ void UGrabber::Grab()
 	//Get players viewpoint
 	FHitResult HitResult = GetFirstPhysicsBodyInReach();
 	UPrimitiveComponent* ComponentToGrab = HitResult.GetComponent();
+	AActor* ActorHit = HitResult.GetActor();
+
 //If we hit somerthing the attach the physics handle
-if(HitResult.GetActor()){
-	//TODO attach physics handle
-	PhysicsHandle->GrabComponentAtLocation(
-		ComponentToGrab,
-		NAME_None,
-		GetPlayersReach()
+if(ActorHit){
+	if(!PhysicsHandle){return;} //To protect pointer
+	PhysicsHandle->GrabComponentAtLocation
+	(
+	ComponentToGrab,
+	NAME_None,
+	GetPlayersReach()
 	);
 }
 }
@@ -63,6 +66,7 @@ if(HitResult.GetActor()){
 
 void UGrabber::Release()
 {
+	if(!PhysicsHandle){return;}
 	UE_LOG(LogTemp,Warning,TEXT("Grabber Released"));
 	PhysicsHandle->ReleaseComponent();
 }
@@ -82,10 +86,11 @@ void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorCompone
 
 	// FVector LineTraceEnd = PlayerViewPointLocation + PlayerViewPointRotation.Vector() * Reach;
 	//If the physics handle is attach
+	if(!PhysicsHandle){return;}
 	if (PhysicsHandle->GrabbedComponent){
+		//Move object we are holding
 		PhysicsHandle->SetTargetLocation(GetPlayersReach());
 	}
-		//Move object we are holding
 }
 
 FHitResult UGrabber::GetFirstPhysicsBodyInReach() const
