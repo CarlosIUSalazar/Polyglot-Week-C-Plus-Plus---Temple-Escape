@@ -1,8 +1,8 @@
 // Copyright Carlos Salazar - For Polyglot Week Code Chrysalis
+#include "Grabber.h"
 #include "DrawDebugHelpers.h"
 #include "Engine/World.h"
 #include "GameFramework/PlayerController.h"
-#include "Grabber.h"
 
 #define OUT
 
@@ -51,20 +51,66 @@ void UGrabber::FindPhysicsHandle(){
 void UGrabber::Grab()
 {
 	UE_LOG(LogTemp,Warning,TEXT("Grabber Press"));
-	//Try and reach any actors with physics body collitions channel set
-	GetFirstPhysicsBodyInReach();
+//Get players viewpoint
+	FVector PlayerViewPointLocation;
+	FRotator PlayerViewPointRotation;
+
+	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
+		OUT PlayerViewPointLocation, 
+		OUT PlayerViewPointRotation
+	); //OUT parameters, Out is a keyowrd we deffined outselves near the header, it doesnt do anyuthing is only for readibility
+
+	//THIS IS A DEBUG FUNCTIUON THAT Draws a laser like line from player showing the reach
+	// DrawDebugLine(
+	// 	GetWorld(),
+	// 	PlayerViewPointLocation,
+	// 	LineTraceEnd,
+	// 	FColor(0,255,0),
+	// 	false,
+	// 	0.f,
+	// 	0,
+	// 	5.f
+	// );
+
+	FVector LineTraceEnd = PlayerViewPointLocation + PlayerViewPointRotation.Vector() * Reach;
+
+	FHitResult HitResult = GetFirstPhysicsBodyInReach();
+	UPrimitiveComponent* ComponentToGrab = HitResult.GetComponent();
+//If we hit somerthing the attach the physics handle
+if(HitResult.GetActor()){
+	//TODO attach physics handle
+	PhysicsHandle->GrabComponentAtLocation(
+		ComponentToGrab,
+		NAME_None,
+		LineTraceEnd
+	);
+}
 }
 
 void UGrabber::Release()
 {
 	UE_LOG(LogTemp,Warning,TEXT("Grabber Released"));
+	PhysicsHandle->ReleaseComponent();
 }
 
 // Called every frame
 void UGrabber::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+		//Get players viewpoint
+	FVector PlayerViewPointLocation;
+	FRotator PlayerViewPointRotation;
+
+	GetWorld()->GetFirstPlayerController()->GetPlayerViewPoint(
+		OUT PlayerViewPointLocation, 
+		OUT PlayerViewPointRotation
+	); //OUT parameters, Out is a keyowrd we deffined outselves near the header, it doesnt do anyuthing is only for readibility
+
+	FVector LineTraceEnd = PlayerViewPointLocation + PlayerViewPointRotation.Vector() * Reach;
 	//If the physics handle is attach
+	if (PhysicsHandle->GrabbedComponent){
+		PhysicsHandle->SetTargetLocation(LineTraceEnd);
+	}
 		//Move object we are holding
 }
 
