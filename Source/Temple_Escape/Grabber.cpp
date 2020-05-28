@@ -5,23 +5,36 @@
 #include "Grabber.h"
 
 #define OUT
+
 // Sets default values for this component's properties
+
 UGrabber::UGrabber()
 {
 	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
 	// off to improve performance if you don't need them.
 	PrimaryComponentTick.bCanEverTick = true;
-
-	// ...
 }
-
 
 // Called when the game starts
 void UGrabber::BeginPlay()
 {
 	Super::BeginPlay();
+	FindPhysicsHandle();
+	SetupInputComponent();
+}
 
-	// ...
+void UGrabber::SetupInputComponent(){
+	InputComponent = GetOwner()->FindComponentByClass<UInputComponent>();
+	if (InputComponent){
+		//UE_LOG(LogTemp, Warning, TEXT("Input component found"),*GetOwner()->GetName());
+		InputComponent->BindAction("Grab",IE_Pressed,this,&UGrabber::Grab);
+		InputComponent->BindAction("Grab", IE_Released,this,&UGrabber::Release);
+	}
+
+}
+
+void UGrabber::FindPhysicsHandle(){
+	//Checking for Physics Handle
 	PhysicsHandle = GetOwner() -> FindComponentByClass<UPhysicsHandleComponent>();
 	if(PhysicsHandle)
 	{
@@ -32,21 +45,17 @@ void UGrabber::BeginPlay()
 		UE_LOG(LogTemp, Warning, TEXT("No physics handle component found on %s!"), *GetOwner()->GetName());
 	}
 
-	InputComponent = GetOwner()->FindComponentByClass<UInputComponent>();
-	if(InputComponent){
-		UE_LOG(LogTemp, Warning, TEXT("Input component found"),*GetOwner()->GetName());
-		InputComponent->BindAction("Grab",IE_Pressed,this,&UGrabber::Grab);
-	}
-	// else 
-	// {
-	// 	UE_LOG(LogTemp, Warning, TEXT("Input component MISSING"),*GetOwner()->GetName());
-	// }
-
 }
+
 
 void UGrabber::Grab()
 {
 	UE_LOG(LogTemp,Warning,TEXT("Grabber Press"));
+}
+
+void UGrabber::Release()
+{
+	UE_LOG(LogTemp,Warning,TEXT("Grabber Released"));
 }
 
 // Called every frame
