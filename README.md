@@ -1,5 +1,5 @@
 # Polyglot-Week-C-Plus-Plus---Temple-Escape
-Polyglot Week C Plus Plus - Temple Escape
+Can you find a way out of the dungeon you're held in?  There are multiple clues that will allow you to open the door and escape to freedom!  Press and hold Right Mouse Button to lift and move objects.  Use W A S D keys to move and SPACE bar to jump.
 
 # Download for Mac: https://bit.ly/3gAHRVS
 
@@ -33,7 +33,7 @@ VERTEX SHADER: 5.0
 SOUND CARD: 100% DirectX 10 compatible
 FREE DISK SPACE: 50 GB
 DEDICATED VIDEO RAM: 2 GB
-å
+
 ### Installing
 
 - Fork and clone this repo to your computer
